@@ -1,4 +1,3 @@
-
 $(document).ready(function() {
     var engine;
     fetch("/cities")
@@ -116,11 +115,11 @@ $(document).ready(function() {
           }
 
           function error() {
-    
+            alert("error");
           }
         
           if(!navigator.geolocation) {
-    
+                alert("geolocation not supported, sorry...");
           } else {
     
             navigator.geolocation.getCurrentPosition(success, error);
