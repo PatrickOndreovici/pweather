@@ -37,12 +37,13 @@ app.post('/city', function(req, res){
             
                 // ... Your code when have result ... //
             });
+            res.send({name: "null"});
         }else{
             const city = new City({ name: cityName, searches_cnt: 1}); 
+            res.send(city);
             city.save();
         }
     });
-    res.send("succes");
 });
 
 app.listen(process.env.PORT || 3000, () => console.log(`Example app listening at http://localhost:${port}`))

@@ -1,11 +1,12 @@
 
 $(document).ready(function() {
+    var engine;
     fetch("/cities")
     .then(function(response){
         return response.json();
     })
     .then(function(data){
-        var engine = new Bloodhound({
+        engine = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             sorter:function(a, b) { 
@@ -49,18 +50,28 @@ $(document).ready(function() {
                 return response.json();
             })
             .then(function(data){
-                $("#location").html(data.name + ", " + data.sys.country);
-                $("#temperature").html(Math.floor(data.main.temp) + " <span>&#8451;</span>");
-                var iconUrl = "http://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png";
-                $("#icon").attr("src", iconUrl);
-                $("#description").html(data.weather[0].description);
-                $("#weather").css("display", "inline-block");
-                const data2 = new URLSearchParams();
-                data2.append("cityName", data.name + ", " + data.sys.country);
-                fetch("/city", {
-                    method: 'post',
-                    body: data2
-                });
+                if (data.cod != "404"){
+                    $("#location").html(data.name + ", " + data.sys.country);
+                    $("#temperature").html(Math.floor(data.main.temp) + " <span>&#8451;</span>");
+                    var iconUrl = "http://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png";
+                    $("#icon").attr("src", iconUrl);
+                    $("#description").html(data.weather[0].description);
+                    $("#weather").css("display", "inline-block");
+                    const data2 = new URLSearchParams();
+                    data2.append("cityName", data.name + ", " + data.sys.country);
+                    fetch("/city", {
+                        method: 'post',
+                        body: data2
+                    })
+                    .then(function(response){
+                        return response.json();
+                    })
+                    .then(function(data){
+                        if (data.name != "null"){
+                            engine.add(data);
+                        }
+                    });
+                }
 
             })
             .catch(function(err){
@@ -71,18 +82,20 @@ $(document).ready(function() {
                 return response.json();
             })
             .then(function(data){
-                $("#hour1").html(GetHour(data.list[0].dt_txt));
-                $("#hour2").html(GetHour(data.list[1].dt_txt));
-                $("#hour3").html(GetHour(data.list[2].dt_txt));
-                $("#temp1").html(Math.floor(data.list[0].main.temp) + " <span>&#8451;</span>");
-                $("#temp2").html(Math.floor(data.list[1].main.temp) + " <span>&#8451;</span>");
-                $("#temp3").html(Math.floor(data.list[2].main.temp) + " <span>&#8451;</span>");
-                iconUrl = "http://openweathermap.org/img/wn/" + data.list[0].weather[0].icon + "@2x.png";
-                $("#icon1").attr("src", iconUrl);
-                iconUrl = "http://openweathermap.org/img/wn/" + data.list[1].weather[0].icon + "@2x.png";
-                $("#icon2").attr("src", iconUrl);
-                iconUrl = "http://openweathermap.org/img/wn/" + data.list[2].weather[0].icon + "@2x.png";
-                $("#icon3").attr("src", iconUrl);
+                if (data.cod != "404"){
+                    $("#hour1").html(GetHour(data.list[0].dt_txt));
+                    $("#hour2").html(GetHour(data.list[1].dt_txt));
+                    $("#hour3").html(GetHour(data.list[2].dt_txt));
+                    $("#temp1").html(Math.floor(data.list[0].main.temp) + " <span>&#8451;</span>");
+                    $("#temp2").html(Math.floor(data.list[1].main.temp) + " <span>&#8451;</span>");
+                    $("#temp3").html(Math.floor(data.list[2].main.temp) + " <span>&#8451;</span>");
+                    iconUrl = "http://openweathermap.org/img/wn/" + data.list[0].weather[0].icon + "@2x.png";
+                    $("#icon1").attr("src", iconUrl);
+                    iconUrl = "http://openweathermap.org/img/wn/" + data.list[1].weather[0].icon + "@2x.png";
+                    $("#icon2").attr("src", iconUrl);
+                    iconUrl = "http://openweathermap.org/img/wn/" + data.list[2].weather[0].icon + "@2x.png";
+                    $("#icon3").attr("src", iconUrl);
+                }
             })
             .catch(function(err){
                 console.error(err);
